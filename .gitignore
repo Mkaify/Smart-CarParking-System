@@ -1,0 +1,18 @@
+# 1. Virtual Environment (Crucial to ignore)
+venv/
+
+# 2. Python compiled files (Bytecode)
+__pycache__/
+*.py[cod]
+
+# 3. Temporary files created by the app
+# (From the code we wrote: 'temp_video.mp4')
+temp_video.mp4
+
+# 4. OS generated files (Clean up Windows metadata)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 5. IDE settings (Optional, if you use VS Code)
+.vscode/
