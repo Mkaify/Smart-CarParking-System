@@ -44,7 +44,7 @@ st.sidebar.header("Settings")
 st.sidebar.header("⚠️ USER CAUTION: To prevent system crashes and 'Missing File' errors, keep the Frame Rate Limit (FPS) slider at 2 or lower. Higher settings will desync the server and disconnect the video stream.")
 
 # Add a frame rate limit control to fix the error
-fps_limit = st.sidebar.slider("Frame Rate Limit (FPS)", 1, 30, 10) 
+fps_limit = st.sidebar.slider("Frame Rate Limit (FPS)", 1, 30, 2) 
 
 video_source = st.sidebar.radio("Select Video Source", ("Default Video", "Upload Your Own"))
 
