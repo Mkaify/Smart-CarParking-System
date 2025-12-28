@@ -3,6 +3,7 @@ import pickle
 import cvzone
 import numpy as np
 import streamlit as st
+import time  # <--- Added this library
 
 # 1. Load the parking positions
 try:
@@ -16,7 +17,8 @@ def checkParkingSpace(img, imgPro):
     spaceCounter = 0
     for pos in posList:
         x, y = pos
-        imgCrop = imgPro[y:y + 33, x:x + 79] # Using dimensions from your repo
+        # Crop logic based on your repository dimensions
+        imgCrop = imgPro[y:y + 33, x:x + 79]
         count = cv2.countNonZero(imgCrop)
 
         if count < 900:
@@ -34,17 +36,21 @@ def checkParkingSpace(img, imgPro):
     return img
 
 # 3. Streamlit Web Interface
+st.set_page_config(page_title="Smart Parking", layout="wide")
 st.title("🚗 Smart Car Parking System")
 
-# Use the video file from the repo or allow user upload
-video_source = st.radio("Select Video Source", ("Default Video", "Upload Your Own"))
+# Sidebar for controls
+st.sidebar.header("Settings")
+# Add a frame rate limit control to fix the error
+fps_limit = st.sidebar.slider("Frame Rate Limit (FPS)", 1, 30, 10) 
+
+video_source = st.sidebar.radio("Select Video Source", ("Default Video", "Upload Your Own"))
 
 if video_source == "Default Video":
     cap = cv2.VideoCapture('carPark.mp4') 
 else:
-    uploaded_file = st.file_uploader("Upload a video...", type=["mp4", "avi"])
+    uploaded_file = st.sidebar.file_uploader("Upload a video...", type=["mp4", "avi"])
     if uploaded_file is not None:
-        # Save uploaded file temporarily to read it with OpenCV
         with open("temp_video.mp4", "wb") as f:
             f.write(uploaded_file.getbuffer())
         cap = cv2.VideoCapture("temp_video.mp4")
@@ -52,15 +58,18 @@ else:
         cap = None
 
 if cap:
-    st_frame = st.empty() # Placeholder for the video frame
+    st_frame = st.empty() # Placeholder
     
     while True:
+        # Calculate time delay to match target FPS
+        start_time = time.time()
+        
         success, img = cap.read()
         if not success:
             cap.set(cv2.CAP_PROP_POS_FRAMES, 0) # Loop video
             continue
 
-        # Image Preprocessing (Gray -> Blur -> Threshold -> Dilate)
+        # Image Preprocessing
         imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         imgBlur = cv2.GaussianBlur(imgGray, (3, 3), 1)
         imgThreshold = cv2.adaptiveThreshold(imgBlur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -72,8 +81,12 @@ if cap:
         # Process the frame
         img = checkParkingSpace(img, imgDilate)
 
-        # Convert BGR to RGB for Streamlit display
+        # Convert BGR to RGB
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
-        # Display the frame in the web app
+        # Display the frame
         st_frame.image(img, channels="RGB")
+        
+        # --- CRITICAL FIX: Control the speed ---
+        # This prevents the "Missing file" error by giving the browser time to render
+        time.sleep(1 / fps_limit)
