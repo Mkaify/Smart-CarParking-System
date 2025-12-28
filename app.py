@@ -41,7 +41,7 @@ st.title("🚗 Smart Car Parking System")
 
 # Sidebar for controls
 st.sidebar.header("Settings")
-st.sidebar.header("⚠️ USER CAUTION: To prevent system crashes and 'Missing File' errors, keep the Frame Rate Limit (FPS) slider at 10 or lower. Higher settings will desync the server and disconnect the video stream.")
+st.sidebar.header("⚠️ USER CAUTION: To prevent system crashes and 'Missing File' errors, keep the Frame Rate Limit (FPS) slider at 2 or lower. Higher settings will desync the server and disconnect the video stream.")
 
 # Add a frame rate limit control to fix the error
 fps_limit = st.sidebar.slider("Frame Rate Limit (FPS)", 1, 30, 10) 
